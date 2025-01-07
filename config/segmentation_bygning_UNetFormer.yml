@@ -1,0 +1,95 @@
+---
+model: UNetFormer
+backbone: resnet34
+dataset: custom_semantic_segmentation
+path_dataset: /mnt/T/mnt/trainingdata/bygningsudpegning/1km2data_for_benchmarking/data/splitted
+path_labels: /mnt/T/mnt/trainingdata/bygningsudpegning/1km2data_for_benchmarking/labels/cleaned_splitted_labels
+
+path_validation_dataset: /mnt/T/mnt/trainingdata/bygningsudpegning/1km2data_for_benchmarking/data/splitted
+path_validation_labels: /mnt/T/mnt/trainingdata/bygningsudpegning/1km2data_for_benchmarking/labels/cleaned_splitted_labels
+
+#o.1 means that only 10% of the data will be used for training
+#0.0 means that all batches willl be used
+#overfit_batches: 0.0
+
+# an integer value will mean that exactly that number of batches will be used
+overfit_batches: 1
+
+
+
+
+
+#data_sources: [rgb,cir,OrtoRGB,OrtoCIR,DSM,DTM]
+data_sources: [rooftop_rgb,rooftop_cir,fast_trueorto,lidar_dsm,lidar_dtm,fast_trueorto_DSM,DSM_no_veg]
+channels: [[0,1,2],[0],[0,1,2],[0],[0],[0],[0]]
+means: [0.37717373,0.36551262,0.35784693,0.21209801,0.4461955,0.43208109,0.4201469,0.11747267,0.09866089,0.11747267,0.11747267]
+stds: [0.16392524,0.1445057,0.134715,0.13147732,0.17134316,0.15107451,0.1288624,0.02500286,0.00640732,0.02500286,0.02500286]
+
+droppable_channels: [7,8,10]
+
+#data_sources: [rgb,cir]
+#channels: [[0,1,2],[0]]
+n_input_channels: 10
+all_txt: /mnt/T/mnt/trainingdata/bygningsudpegning/1km2data_for_benchmarking/all.txt
+valid_txt: /mnt/T/mnt/trainingdata/bygningsudpegning/1km2data_for_benchmarking/splittted_1km_6084_551.txt
+train_txt: /mnt/T/mnt/trainingdata/bygningsudpegning/1km2data_for_benchmarking/train.txt
+
+optimizer: adam
+wd: 0.0
+ignore_index: 0
+label_smoothing: 0.0
+
+
+#EPOCHS
+epochs: 10
+#LR
+lr: 0.001
+
+
+#learning_rate_schedule:
+# name: "LinearLR"
+learning_rate_schedule:
+ name: fit_one_cykle
+ pct_start: 0.3
+batchsize: 4
+#batchsize: 32
+#default 1== no accumulated batches
+#remember that accumulating batches not helps with batchnormalisation layers!
+accumulate_grad_batches: 1
+gradient_clip_val: 1.0
+save_interval: 100
+save_dir: "bygning/resnet50/"
+resume_training: False
+val_check_interval: 1
+log_every_n_steps: 20
+accelerator: "auto"
+devices: 1
+state_dict_path_load: False
+transforms: False
+vit_transforms: False
+
+experment_name: "notrans_renset50_bygning_all"
+#loss: cross_entropy
+loss: unet_former_loss
+
+#normalization
+#The datatye of the input affects how differetn transforms behave. floats will be cipped to range[-1,1].
+#It is sometimes necessary to cast the input images to uin8 in order to make sure this format is used
+#OBS: lidar values are floats and these datatypes might have to be preprocessed in some better way!
+convert_input_data_to: uint8
+
+
+#means: [0.485, 0.456, 0.406,0.40779021]
+#stds: [0.229, 0.224, 0.225,0.15176421]
+
+
+#pytorch lightning specific settings
+#https://lightning.ai/docs/pytorch/latest/common/trainer.html#num-sanity-val-steps
+num_sanity_val_steps: 0
+
+
+#visaulization
+#set this to a positive number in order to visualize the data as it looks after transforms have been aplied
+nr_of_visualizations: 0
+
+

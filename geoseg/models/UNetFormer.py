@@ -355,12 +355,13 @@ class UNetFormer(nn.Module):
                  backbone_name='swsl_resnet18',
                  pretrained=True,
                  window_size=8,
-                 num_classes=6
+                 num_classes=6,
+                 in_chans =3
                  ):
         super().__init__()
 
         self.backbone = timm.create_model(backbone_name, features_only=True, output_stride=32,
-                                          out_indices=(1, 2, 3, 4), pretrained=pretrained)
+                                          out_indices=(1, 2, 3, 4), pretrained=pretrained,in_chans=in_chans)
         encoder_channels = self.backbone.feature_info.channels()
 
         self.decoder = Decoder(encoder_channels, decode_channels, dropout, window_size, num_classes)
